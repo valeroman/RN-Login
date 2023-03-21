@@ -1,7 +1,8 @@
 import { StackScreenProps } from '@react-navigation/stack';
-import React from 'react'
-import { KeyboardAvoidingView, Platform, Text, TextInput, View, Keyboard, TouchableOpacity } from 'react-native'
+import React, { useContext, useEffect } from 'react'
+import { KeyboardAvoidingView, Platform, Text, TextInput, View, Keyboard, TouchableOpacity, Alert } from 'react-native'
 import { WhiteLogo } from '../components/WhiteLogo'
+import { AuthContext } from '../context/AuthContext';
 import { useForm } from '../hooks/useForm'
 import { loginStyles } from '../theme/loginTheme';
 
@@ -9,15 +10,35 @@ interface Props extends StackScreenProps<any, any> {};
 
 export const RegisterScreen = ({ navigation }: Props) => {
 
-  const { email, password, fullname, onChange} = useForm({
-    fullname: '',
+  const { errorMessage, signUp, removeError } = useContext( AuthContext );
+
+  const { email, password, fullName, onChange} = useForm({
+    fullName: '',
     email: '',
     password: ''
   });
 
+  useEffect(() => {
+    if ( errorMessage.length === 0 ) return;
+
+    Alert.alert( 
+      'Registro incorrecto', 
+      errorMessage.toString(),
+      [
+        {
+          text: 'Ok',
+          onPress: removeError
+        }
+      ]
+    );
+
+  },[ errorMessage ]);
+
   const onRegister = () => {
-    console.log({ email, password, fullname });
+    // console.log({ email, password, fullName });
     Keyboard.dismiss();
+    signUp({ email, fullName, password })
+
   }
 
 
@@ -44,8 +65,8 @@ export const RegisterScreen = ({ navigation }: Props) => {
             ]}
             selectionColor="white"
 
-            onChangeText={( value ) => onChange( value, 'fullname')}
-            value={ fullname }
+            onChangeText={( value ) => onChange( value, 'fullName')}
+            value={ fullName }
             onSubmitEditing={ onRegister }
 
             autoCapitalize='words'

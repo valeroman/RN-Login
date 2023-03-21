@@ -171,6 +171,23 @@ Documentación https://reactnavigation.org/docs/getting-started
     }
 ```
 
+### Async - Storage 
+
+Documentación: https://react-native-async-storage.github.io/async-storage/docs/install/
+
+
+- Instalación de libreria: 
+    ```yarn add @react-native-async-storage/async-storage```
+
+
+- Realizar un `npx pod-install`
+
+- Para usar esa libreria importamos:
+    ```
+    import AsyncStorage from '@react-native-async-storage/async-storage';
+    ```
+
+
 
 
 
