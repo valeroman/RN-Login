@@ -10,30 +10,30 @@ npx react-native init AwesomeTSProject --template react-native-template-typescri
 
 Documentación https://github.com/oblador/react-native-vector-icons#ios
 
-####Configuracion en IOS:
+#### Configuracion en IOS:
 
-instalar el paquete
-```
-yarn add react-native-vector-icons
-yarn add -D @types/react-native-vector-icons
-```
-Abrir en el proyecto la carpeta `node_modules`
+- instalar el paquete:
+    ```
+        yarn add react-native-vector-icons
+        yarn add -D @types/react-native-vector-icons
+    ```
+- Abrir en el proyecto la carpeta `node_modules`
     - buscar la carpeta `react-native-vector-icon`
     - buscar la carpeta `Fonts`
     - buscar el archivo `Ionicons.ttf`
 
-Abrir el workspace `xcode` del proyecto:
- - crear un new group llamado Fonts
- - Arrastrar el archivo `Ionicons.ttf` a la carpeta `Fonts` en xcode
+- Abrir el workspace `xcode` del proyecto:
+    - crear un new group llamado Fonts
+    - Arrastrar el archivo `Ionicons.ttf` a la carpeta `Fonts` en xcode
  - seleccionamos: 
     - Destination: `copy item if needed`
     - Added folders: `Create folder references`
     - Add to target: `login`
 
-Abrimos la carpeta login en xcode:
- - Seleccionamos el archivo `info.plist`
- - Click derecho => Open As => Source Code
- - copiamos dentro del archivo `info.plist` despues del tag `</false>`
+- Abrimos la carpeta login en xcode:
+    - Seleccionamos el archivo `info.plist`
+    - Click derecho => Open As => Source Code
+    - copiamos dentro del archivo `info.plist` despues del tag `</false>`
     ```
     <key>UIAppFonts</key>
     <array>
@@ -82,7 +82,7 @@ note: Removed stale file '/Users/romanvalero/Library/Developer/Xcode/DerivedData
  
 
 
-####Configuracion en Android:
+#### Configuracion en Android:
 
 - Ir a la ruta dentro VSCode `android/app/build.gradle`
 - pego el siguiente coodigo y solo coloco el archivo de Ionicons.ttf:
@@ -135,7 +135,7 @@ Documentación https://reactnavigation.org/docs/getting-started
     }
     ```
 
-###Stack Navigation
+### Stack Navigation
 - Instalar:
     ```
     yarn add @react-navigation/stack
@@ -171,6 +171,353 @@ Documentación https://reactnavigation.org/docs/getting-started
     }
 ```
 
+## Configuración de Redux - Redux Toolkit
+Documentación: https://redux-toolkit.js.org/introduction/getting-started
+
+- Instalación de paquetes:
+ ``` yarn add @reduxjs/toolkit react-redux ```
+
+### ConfigureStore y Slice
+
+- Creamos la carpeta `store`, dentro del scr
+- Creamos el archivo `store.ts`
+-Agregamos el siguuiente codigo:
+
+```
+import { configureStore } from '@reduxjs/toolkit'
+
+export const store = configureStore({
+  reducer: {},
+})
+
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>
+// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+export type AppDispatch = typeof store.dispatch
+```
+- Agregamos un archivo `index.ts`, dentro de la carpeta `store`
+- Exportamos todo: `export * from './store';`
+
+- Agregamos el Provider en el archivo `App.tsx`
+
+```
+import { Provider } from 'react-redux';
+import { store } from './src/store/store';
+
+const App = () => {
+
+  return (
+    <Provider store={ store }>
+      <NavigationContainer>
+        <Navigator />
+      </NavigationContainer>
+    </Provider>
+  )
+}
+```
+
+- Creamos una nueva carpeta llamada `slices` dentro de la carpeta `store`
+
+- Dentro de la carpeta `slices`, creamos la carpeta `theme`
+
+- Creamos nuestro archivo `themeSlice.tsx`
+
+- Agregamos el siguiente coodigo:
+```
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+    theme: {
+        currentTheme: 'light',
+        dark: false,
+        dividerColor: 'rgba(0,0,0,0.7)',
+        colors: {
+            primary: '#084F6A',
+            background: 'white',
+            card: 'white',
+            text: 'brown',
+            border: 'black',
+            notification: 'teal',
+        },
+    }
+}
+
+export const themeSlice = createSlice({
+    name: 'theme',
+    initialState,
+    reducers: {
+        onSetLightTheme: ( state, action ) => {
+            state.theme = action.payload; 
+        },
+        onSetDarkTheme: ( state, action ) => {
+            state.theme = action.payload
+        }
+    }
+})
+
+export const { onSetLightTheme, onSetDarkTheme } = themeSlice.actions;
+```
+Agregamos un archivo `index.ts`, dentro de la carpeta `theme`
+
+Exportamos todo: export * from './themeSlice';
+
+- Agregamos un reducer al `store`
+- Abrimos el archivo `store.ts`
+- Agregamos el siguiente codigo: 
+```
+import { configureStore } from '@reduxjs/toolkit'
+import { themeSlice } from './slices/theme'
+
+
+export const store = configureStore({
+  reducer: {
+    theme: themeSlice.reducer
+  },
+})
+
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>
+// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+export type AppDispatch = typeof store.dispatch
+```
+
+- Creamos el hook personalizado, para importar el `RootState` y el `AppDispatch`
+- Dentro de la carpeta `store`, creamos el archivo `hooks.ts` y agregamos el siguiente codigo:
+```
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from './';
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+```
+- Lo exportamos al archivo `index.ts`
+
+- Creamos los hooks `useTheme` y `useThemeStore`, en la carpta `src/hooks/theme`
+
+- Agregamos un archivo `index.ts`, dentro de la carpeta `hooks/theme`
+
+- Agregamos el codigo en el `useTheme`
+
+```
+import { Theme } from '@react-navigation/native';
+
+export interface ThemeState extends Theme {
+
+    currentTheme: 'light' | 'dark';
+    dividerColor: string;
+    secondaryColor: string;
+}
+
+export const useThemes = () => {
+
+    const lightTheme: ThemeState = {
+        currentTheme: 'light',
+        dark: false,
+        dividerColor: 'rgba(0,0,0,0.7)',
+        colors: {
+            primary: '#084F6A',
+            background: 'white',
+            card: 'white',
+            text: 'red',
+            border: 'black',
+            notification: 'teal',
+        },
+        secondaryColor: '#D9D9DB'
+    }
+    
+    const darkTheme: ThemeState = {
+        currentTheme: 'dark',
+        dark: true,
+        dividerColor: 'rgba(255,255,255,0.6)',
+        colors: {
+            primary: '#75CEDB',
+            background: 'black',
+            card: 'white',
+            text: 'white',
+            border: 'white',
+            notification: 'teal',
+        },
+        secondaryColor: 'white'
+    }
+
+    return {
+        lightTheme,
+        darkTheme,
+    }
+}
+```
+
+- Agregamos el codigo en el `useThemeStore`
+
+```
+import { useDispatch, useSelector } from 'react-redux'
+import { onSetDarkTheme, onSetLightTheme } from '../../store/slices/theme';
+import { AppDispatch, RootState } from '../../store/store';
+import { ThemeState } from '../theme';
+
+export const useThemeStore = () => {
+
+    const dispatch = useDispatch<AppDispatch>();
+    const { theme }: any = useSelector<RootState>( state => state.theme );
+
+    const setDarkTheme = ( setDarkTheme: ThemeState ) => {
+        dispatch( onSetDarkTheme( setDarkTheme ) );
+    }
+
+    const setLightTheme = ( setLightTheme: ThemeState ) => {
+        dispatch( onSetLightTheme( setLightTheme ));
+    }
+
+    return {
+        theme,
+        setDarkTheme,
+        setLightTheme
+    }
+}
+```
+
+- Creamos la carpeta `helpers` y dentro de helpers creamos la carpeta `provider`
+- Creamos el archivo `ThemeProvider.tsx`
+
+- Agregamos el siguiente codigo:
+```
+import React, { useEffect } from 'react'
+import { Appearance, AppState, View } from 'react-native'
+import { useThemes, useThemeStore } from '../../hooks/theme';
+
+
+export const ThemeProvider = ({ children }: any) => {
+
+    const { setDarkTheme, setLightTheme } = useThemeStore();
+
+    const { darkTheme, lightTheme } = useThemes();
+
+    console.log('UNO');
+
+    useEffect(() => {
+        AppState.addEventListener('change', ( status ) => {
+            console.log({status});
+            if ( status === 'active' ) {
+                ( Appearance.getColorScheme() === 'light' )
+                    ? setLightTheme(lightTheme)
+                    : setDarkTheme(darkTheme)
+            }
+        });
+
+    },[]);
+
+    return (
+        <>
+            { children }
+        </>
+    )
+}
+```
+
+- Modificamos el archivo `App.tsx` agregando:
+
+```
+import 'react-native-gesture-handler'
+import React from 'react'
+import { NavigationContainer } from '@react-navigation/native';
+import { Navigator } from './src/navigator/Navigator';
+
+import { Provider } from 'react-redux';
+import { store } from './src/store';
+import { ThemeProvider } from './src/helpers/providers/ThemeProvider';
+
+const App = () => {
+
+  return (
+    <Provider store={ store }>
+      <AppThemeState>
+        <NavigationContainer>
+          <Navigator />
+        </NavigationContainer>
+      </AppThemeState>
+    </Provider>
+  )
+}
+
+const AppThemeState = ({ children }: any) => {
+
+  return (
+    <ThemeProvider>
+      { children }
+    </ThemeProvider>
+  )
+}
+
+export default App;
+```
+
+- Ahora modificamos el archivo `Navigator.tsx` coneste codigo:
+```
+import 'react-native-gesture-handler'
+import React from 'react'
+import { NavigationContainer } from '@react-navigation/native';
+import { Navigator } from './src/navigator/Navigator';
+
+import { Provider } from 'react-redux';
+import { store } from './src/store';
+import { ThemeProvider } from './src/helpers/providers/ThemeProvider';
+
+const App = () => {
+
+  return (
+    <Provider store={ store }>
+      <AppThemeState>
+        <Navigator />
+      </AppThemeState>
+    </Provider>
+  )
+}
+
+const AppThemeState = ({ children }: any) => {
+
+  return (
+    <ThemeProvider>
+      { children }
+    </ThemeProvider>
+  )
+}
+
+export default App;
+```
+
+- Ahora el `App.tsx` queda asi:
+```
+import 'react-native-gesture-handler'
+import React from 'react'
+import { NavigationContainer } from '@react-navigation/native';
+import { Navigator } from './src/navigator/Navigator';
+
+import { Provider } from 'react-redux';
+import { store } from './src/store';
+import { ThemeProvider } from './src/helpers/providers/ThemeProvider';
+
+const App = () => {
+
+  return (
+    <Provider store={ store }>
+      <AppThemeState>
+        <Navigator />
+      </AppThemeState>
+    </Provider>
+  )
+}
+
+const AppThemeState = ({ children }: any) => {
+
+  return (
+    <ThemeProvider>
+      { children }
+    </ThemeProvider>
+  )
+}
+
+export default App;
+```
 
 
 

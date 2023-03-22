@@ -4,11 +4,14 @@ import { KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View
 import { Background } from '../components/Background'
 import { WhiteLogo } from '../components/WhiteLogo'
 import { useForm } from '../hooks/useForm';
+import { useAppSelector } from '../store';
 import { loginStyles } from '../theme/loginTheme';
 
 interface Props extends StackScreenProps<any, any> {};
 
 export const LoginScreen = ({ navigation }: Props) => {
+
+  const { theme } = useAppSelector( state => state.theme );
 
   const { email, password, onChange} = useForm({
     email: '',
@@ -32,7 +35,10 @@ export const LoginScreen = ({ navigation }: Props) => {
         <View style={ loginStyles.formContainer }>
           <WhiteLogo />
 
-          <Text style={ loginStyles.title }>Login</Text>
+          <Text style={{
+            ...loginStyles.title,
+            color: theme.colors.text
+          }}>Login</Text>
 
           <Text style={ loginStyles.label }>Email:</Text>
           <TextInput 

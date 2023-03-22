@@ -10,13 +10,13 @@ export const loginStyles = StyleSheet.create({
         // backgroundColor: 'orange'
     },
     title: {
-        color: 'white',
+        // color: 'white',
         fontSize: 30,
         fontWeight: 'bold',
         marginTop: 20
     },
     label: {
-        color: 'white',
+       color: 'white',
        fontWeight: 'bold',
        marginTop: 25,
        fontSize: 16
