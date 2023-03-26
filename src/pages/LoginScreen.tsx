@@ -7,6 +7,7 @@ import { WhiteLogo } from '../components/WhiteLogo'
 import { useForm } from '../hooks/useForm';
 import { useAppSelector } from '../store';
 import { removeError, startLoginWithEmailPassword } from '../store/slices/auth';
+import { fetchPokemons } from '../store/slices/pokemon/thunks';
 import { fetchUsers } from '../store/slices/user/thunks';
 
 import { loginStyles } from '../theme/loginTheme';
@@ -30,7 +31,8 @@ export const LoginScreen = ({ navigation }: Props) => {
     Keyboard.dismiss();
     // startLoginWithEmailPassword({ email, password });
     // startLoginWithEmailPassword();
-    fetchUsers();
+    // fetchUsers();
+    fetchPokemons();
   }
 
   useEffect(() => {
