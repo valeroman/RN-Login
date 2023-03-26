@@ -6,7 +6,7 @@ import { ThemeState } from '../theme';
 export const useThemeStore = () => {
 
     const dispatch = useDispatch<AppDispatch>();
-    const { theme }: any = useSelector<RootState>( state => state.theme );
+    // const { theme }: any = useSelector<RootState>( state => state.theme );
 
     const setDarkTheme = ( setDarkTheme: ThemeState ) => {
         dispatch( onSetDarkTheme( setDarkTheme ) );
@@ -17,7 +17,7 @@ export const useThemeStore = () => {
     }
 
     return {
-        theme,
+        // theme,
         setDarkTheme,
         setLightTheme
     }

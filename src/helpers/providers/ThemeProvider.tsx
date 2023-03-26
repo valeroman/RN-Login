@@ -9,8 +9,6 @@ export const ThemeProvider = ({ children }: any) => {
 
     const { darkTheme, lightTheme } = useThemes();
 
-    console.log('UNO');
-
     useEffect(() => {
         AppState.addEventListener('change', ( status ) => {
             console.log({status});

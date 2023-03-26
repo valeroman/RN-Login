@@ -1,14 +1,37 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit'
+import { tesloApi } from '../api'
+
+import { authSlice } from './slices/auth'
 import { themeSlice } from './slices/theme'
+import { userSlice } from './slices/user/userSlice'
 
 
 export const store = configureStore({
   reducer: {
-    theme: themeSlice.reducer
+    // theme: themeSlice.reducer,
+    auth: authSlice.reducer,
+    user: userSlice.reducer
+
+    // [tesloApi.reducerPath]: tesloApi.reducer,
   },
+  // middleware: getDefaultMiddleware =>
+  // getDefaultMiddleware({
+  //   thunk: {
+  //     extraArgument: tesloApi
+  //   }
+  // })
+  // middleware: getDefaultMiddleware =>
+  //   getDefaultMiddleware({immutableCheck: false, serializableCheck: false}),
+  // middleware: (getDefaultMiddleware) => getDefaultMiddleware()
+  //     .concat( tesloApi.middleware )
 })
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
-export type AppDispatch = typeof store.dispatch
+
+export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;

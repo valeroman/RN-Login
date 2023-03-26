@@ -13,11 +13,13 @@ import { NavigationContainer } from '@react-navigation/native';
 
     export const  Navigator = () => {
 
-        const { theme } = useAppSelector( state => state.theme );
+        // const { theme } = useAppSelector( state => state.theme );
 
         return (
-            <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
-                <NavigationContainer theme={ theme }>
+            <View style={{ flex: 1 }}>
+                <NavigationContainer>
+            {/* // <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
+            //     <NavigationContainer theme={ theme }> */}
                     <Stack.Navigator
                         screenOptions={{
                             headerShown: false,

@@ -265,7 +265,7 @@ Exportamos todo: export * from './themeSlice';
 - Abrimos el archivo `store.ts`
 - Agregamos el siguiente codigo: 
 ```
-import { configureStore } from '@reduxjs/toolkit'
+import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit'
 import { themeSlice } from './slices/theme'
 
 
@@ -279,6 +279,12 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
 ```
 
 - Creamos el hook personalizado, para importar el `RootState` y el `AppDispatch`
@@ -518,6 +524,65 @@ const AppThemeState = ({ children }: any) => {
 
 export default App;
 ```
+### Thunks
+Es una acción que es asincrona que dispara otra acción.
+
+- Creamos el archivo `thunks.ts`, dentro de la carpeta `slices/auth`
+
+- Codigo de ejemplo:
+```
+import { AppThunk } from "../../store"
+
+export const signIn = (): AppThunk => {
+    return async(dispatch, getState) => {
+
+    }
+}
+```
+### Axios
+- Instalación de `axios`, para realizar peticiones `http`
+`yarn add axios`
+
+- Creamos la carpeta `api` dentro de la carpeta `scr`
+- Creamos el archivo `tesloApi.tsx`
+- Agregamos el siguiente codigo:
+```
+
+import axios  from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+const baseURL = 'http://localhost:3001/api';
+
+const tesloApi = axios.create({ baseURL });
+
+tesloApi.interceptors.request.use(
+    async(config) => {
+        const token = await AsyncStorage.getItem('token');
+        if ( token ) {
+            config.headers["Authorization"] = `Bearer ${ token }`;
+        }
+        return config;
+    }
+)
+
+
+export default tesloApi;
+```
+
+
+
+### Async - Storage
+Documentación: https://react-native-async-storage.github.io/async-storage/docs/install/
+
+- Instalación de libreria: 
+`yarn add @react-native-async-storage/async-storage`
+
+- Realizar un `npx pod-install`
+
+- Para usar esa libreria importamos:
+
+```import AsyncStorage from '@react-native-async-storage/async-storage';```
 
 
 
