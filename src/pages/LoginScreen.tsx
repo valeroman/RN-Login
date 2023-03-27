@@ -4,14 +4,18 @@ import { KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View
 import { Background } from '../components/Background'
 import { WhiteLogo } from '../components/WhiteLogo'
 import { useForm } from '../hooks/useForm';
-import { useAppSelector } from '../store';
+import { useAppDispatch } from '../store/hooks';
+import { fetchPokemons } from '../store/slices/pokemon/thunks';
+// import { useAppSelector } from '../store';
 import { loginStyles } from '../theme/loginTheme';
 
 interface Props extends StackScreenProps<any, any> {};
 
 export const LoginScreen = ({ navigation }: Props) => {
 
-  const { theme } = useAppSelector( state => state.theme );
+  // const { theme } = useAppSelector( state => state.theme );
+
+  const dispatch = useAppDispatch();
 
   const { email, password, onChange} = useForm({
     email: '',
@@ -21,6 +25,8 @@ export const LoginScreen = ({ navigation }: Props) => {
   const onLogin = () => {
     console.log({ email, password });
     Keyboard.dismiss();
+
+    dispatch(fetchPokemons());
   }
 
   return (
@@ -37,7 +43,7 @@ export const LoginScreen = ({ navigation }: Props) => {
 
           <Text style={{
             ...loginStyles.title,
-            color: theme.colors.text
+            // color: theme.colors.text
           }}>Login</Text>
 
           <Text style={ loginStyles.label }>Email:</Text>

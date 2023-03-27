@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { LoginScreen } from '../pages/LoginScreen';
 import { RegisterScreen } from '../pages/RegisterScreen';
 import { ProtectedScreen } from '../pages/ProtectedScreen';
-import { useAppSelector } from '../store';
+// import { useAppSelector } from '../store';
 import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -13,11 +13,11 @@ import { NavigationContainer } from '@react-navigation/native';
 
     export const  Navigator = () => {
 
-        const { theme } = useAppSelector( state => state.theme );
+        // const { theme } = useAppSelector( state => state.theme );
 
         return (
-            <View style={{ backgroundColor: theme.colors.background, flex: 1 }}>
-                <NavigationContainer theme={ theme }>
+            <View style={{ flex: 1 }}>
+                <NavigationContainer >
                     <Stack.Navigator
                         screenOptions={{
                             headerShown: false,
