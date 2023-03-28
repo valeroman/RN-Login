@@ -279,12 +279,6 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
->;
 ```
 
 - Creamos el hook personalizado, para importar el `RootState` y el `AppDispatch`
@@ -531,12 +525,21 @@ Es una acción que es asincrona que dispara otra acción.
 
 - Codigo de ejemplo:
 ```
-import { AppThunk } from "../../store"
+export const startLoginWithEmailPassword = ({ email, password }: LoginData) => {
+  return async (dispatch: AppDispatch) => {
 
-export const signIn = (): AppThunk => {
-    return async(dispatch, getState) => {
+      try {
+          const { data } = await tesloApi.post<User>('/auth/login', { email, password });
+          dispatch( signIn( data ) );
 
-    }
+          await AsyncStorage.setItem('token', data.token);
+          
+      } catch (error: any) {
+          console.log('[error]', error.response.data.message)
+          dispatch( addError( error.response.data.message || 'Información incorrecta Login' ));
+      }
+
+  }
 }
 ```
 ### Axios

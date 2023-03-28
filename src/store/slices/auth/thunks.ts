@@ -1,47 +1,70 @@
-import { PayloadAction, ThunkAction } from "@reduxjs/toolkit";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import tesloApi from "../../../api/tesloApi";
-import { LoginData, User } from "../../../interfaces/authInterfaces"
-import { AppThunk, RootState } from "../../store"
-import { signIn, addError, removeError } from "./authSlice";
+import { LoginData, RegisterData, User } from "../../../interfaces/authInterfaces"
+import { AppDispatch } from "../../store";
+import { signIn, addError, notAuthenticated, signUp  } from "./authSlice";
 
 
 
-export const startLoginWithEmailPassword = (): ThunkAction<void, RootState, unknown, PayloadAction<User>> => async (
-    dispatch
-  ) => {
-    console.log('entro');
+
+export const startLoginWithEmailPassword = ({ email, password }: LoginData) => {
+  return async (dispatch: AppDispatch) => {
+
+      try {
+          const { data } = await tesloApi.post<User>('/auth/login', { email, password });
+          dispatch( signIn( data ) );
+
+          await AsyncStorage.setItem('token', data.token);
+          
+      } catch (error: any) {
+          console.log('[error]', error.response.data.message)
+          dispatch( addError( error.response.data.message || 'Información incorrecta Login' ));
+      }
+
+  }
+}
+
+export const startSignUp = ({ email, fullName, password }: RegisterData ) => {
+  return async (dispatch: AppDispatch) => {
+
     try {
-    //   dispatch(getUsersStart());
-    //   const response = await axios.get<User[]>('https://jsonplaceholder.typicode.com/users');
-    //   dispatch(getUsersSuccess(response.data));
-    } catch (error) {
-    //   dispatch(getUsersFailure(error.message));
-    console.log(error)
+        const { data } = await tesloApi.post<User>('/auth/register', { email, fullName, password });
+  
+        dispatch( signUp( data ) );
+  
+        
+  
+    } catch (error: any) {
+      console.log('[error]', error.response.data.message)
+      dispatch( addError( error.response.data.message || 'Información incorrecta signUp' ));
     }
-  };
+  }
+};
 
-// export const startLoginWithEmailPassword = ({ email, password }: LoginData): AppThunk => {
-// export const startLoginWithEmailPassword = (): AppThunk => {
-//     return async (dispatch) => {
-//         console.log('entro');
-//         try {
-//             const { data } = await tesloApi.post<User>('/auth/login', { email, password });
-//             console.log('[DATA]', data);
-//             dispatch(signIn({
-//                 payload: {
-//                     token: data.token,
-//                     user: {
-//                         id: data.id,
-//                         email: data.email,
-//                         password: data.password,
-//                         token: data.token
-//                     }
-//                 }
-//             }))
-//         } catch (error: any) {
-//             console.log('[error]', error)
-//             dispatch( addError({ payload: error.response.data.message || 'Información incorrecta' }));
-//         }
+export const checkToken = () => {
+  return async (dispatch: AppDispatch) => {
+    const token = await  AsyncStorage.getItem('token');
 
-//     }
-// }
+    // No token, no autenticado
+    if ( !token ) return dispatch( notAuthenticated( ));
+
+    // Hay token
+    try {
+        const resp = await tesloApi.get('/auth/check-status');
+
+        if ( resp.status !== 200 ) {
+            return dispatch( notAuthenticated() );
+        };
+
+        await AsyncStorage.setItem('token', resp.data.token);
+
+        dispatch(signIn( resp.data ))
+
+    } catch (error: any) {
+        // console.log('======ERROR=====',error)
+        console.log('[error]', error.response.data.message)
+        dispatch( addError( error.response.data.message || 'Información incorrecta check token' ));
+    }
+  }
+}

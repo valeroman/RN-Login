@@ -1,13 +1,11 @@
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect } from 'react'
 import { KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View, Keyboard, Alert } from 'react-native'
-import { useDispatch } from 'react-redux';
 import { Background } from '../components/Background'
 import { WhiteLogo } from '../components/WhiteLogo'
 import { useForm } from '../hooks/useForm';
-import { useAppSelector } from '../store';
+import { useAppDispatch, useAppSelector } from '../store';
 import { removeError, startLoginWithEmailPassword } from '../store/slices/auth';
-import { fetchUsers } from '../store/slices/user/thunks';
 
 import { loginStyles } from '../theme/loginTheme';
 
@@ -15,9 +13,9 @@ interface Props extends StackScreenProps<any, any> {};
 
 export const LoginScreen = ({ navigation }: Props) => {
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  // const { theme } = useAppSelector( state => state.theme );
+  const { theme } = useAppSelector( state => state.theme );
   const { errorMessage } = useAppSelector( state => state.auth );
 
   const { email, password, onChange} = useForm({
@@ -26,11 +24,8 @@ export const LoginScreen = ({ navigation }: Props) => {
   });
 
   const onLogin = () => {
-    console.log({ email, password });
     Keyboard.dismiss();
-    // startLoginWithEmailPassword({ email, password });
-    // startLoginWithEmailPassword();
-    fetchUsers();
+    dispatch(startLoginWithEmailPassword({ email, password }));
   }
 
   useEffect(() => {
@@ -48,7 +43,6 @@ export const LoginScreen = ({ navigation }: Props) => {
    )
   }, [ errorMessage ])
   
-
   return (
     // ! usamos fragment para que se pueda hacer scroll y el fondo se quede estatico
     <>
@@ -63,7 +57,7 @@ export const LoginScreen = ({ navigation }: Props) => {
 
           <Text style={{
             ...loginStyles.title,
-            // color: theme.colors.text
+            color: theme.colors.text
           }}>Login</Text>
 
           <Text style={ loginStyles.label }>Email:</Text>

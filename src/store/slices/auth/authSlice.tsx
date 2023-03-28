@@ -25,6 +25,12 @@ export const authSlice = createSlice({
             state.token = action.payload.token;
             state.user = action.payload;
         },
+        signUp: ( state, action: PayloadAction<User> ) => {
+            state.status = 'authenticated'; 
+            state.errorMessage = '';
+            state.token = action.payload.token;
+            state.user = action.payload;
+        },
         addError: ( state, action ) => {
             state.status = 'not-authenticated';
             state.errorMessage = action.payload;
@@ -33,9 +39,19 @@ export const authSlice = createSlice({
         },
         removeError: ( state ) => {
             state.errorMessage = '';
-        }
+        },
+        logout: ( state ) => {
+            state.status = 'not-authenticated';
+            state.token = null;
+            state.user= null;
+        },
+        notAuthenticated: ( state ) => {
+            state.status = 'not-authenticated';
+            state.token = null;
+            state.user= null;
+        },
        
     }
 })
 
-export const { signIn, addError, removeError } = authSlice.actions;
+export const { signIn, signUp,  addError, removeError, logout, notAuthenticated } = authSlice.actions;
