@@ -587,5 +587,78 @@ Documentación: https://react-native-async-storage.github.io/async-storage/docs/
 
 ```import AsyncStorage from '@react-native-async-storage/async-storage';```
 
+### React Hook Form
+Documentación: https://react-hook-form.com/ 
+
+- Instalación de libreria: 
+`yarn add react-hook-form`
+
+- Como se usa:
+  - Importamos la libreria
+    ```
+    import { useForm, Controller } from 'react-hook-form';
+    ```
+  - Creamos un typado:
+    ```
+      type FormData = {
+        email: string,
+        password: string
+      }
+    ```
+  - Agregamos el siguiente codigo:
+    ```
+      const { control, handleSubmit, formState: { errors }, watch } = useForm<FormData>();
+      const emailWatch = watch('email'); // me permite observar si el campo email esta cambiando
+
+      const onLogin = (data: FormData) => {
+        Keyboard.dismiss();
+        dispatch(startLoginWithEmailPassword({ email: data.email, password: data.password }));
+      }
+    ```
+  - Utilizar en el input `email` los siguente:
+    ```
+    <Controller 
+      control={ control }
+      name="email"
+      rules={{ 
+        required: 'email is required',
+        validate:  value => isValidEmail(emailWatch) || "Email is invalid"
+      }}
+      render={ ({ field: { value, onBlur, onChange } }) => 
+        <TextInput 
+          placeholder='Ingrese su email'
+          placeholderTextColor="rgba(255,255,255,0.4)"
+          keyboardType='email-address'
+          underlineColorAndroid="white"
+          value={ value }
+          onBlur={ onBlur }
+          onChangeText={ onChange }
+          style={[
+            {borderColor: errors.email ? 'red' : 'white'},
+            loginStyles.inputField,
+            ( Platform.OS === 'ios' ) && loginStyles.inputFieldIOS
+          ]}
+          selectionColor="white"
+          onSubmitEditing={ handleSubmit(onLogin) }
+          autoCapitalize='none'
+          autoCorrect={ false }
+        />
+      }
+    />
+    {errors.email && <Text style={{ color: 'red', alignSelf: 'stretch', fontWeight: 'bold' }}>{ errors.email?.message }</Text>}
+    ```
+
+### Selector Picker
+Documentación: https://www.npmjs.com/package/@react-native-picker/picker
+
+- Instalación de libreria: 
+`yarn add @react-native-picker/picker`
+
+- Realizar un `npx pod-install`
+
+- Importamos el paquete:
+  ```
+  import { Picker } from '@react-native-picker/picker';
+  ```
 
 

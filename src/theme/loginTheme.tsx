@@ -23,12 +23,12 @@ export const loginStyles = StyleSheet.create({
     },
     inputField: {
         color: 'white',
-        fontSize: 20
+        fontSize: 20,
     },
     inputFieldIOS: {
         borderBottomWidth: 2,
-        borderBottomColor: 'white',
-        paddingBottom: 4
+        // borderBottomColor: 'white',
+        paddingBottom: 4,
     },
     buttonContainer: {
         alignItems: 'center',

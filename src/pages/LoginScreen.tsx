@@ -1,31 +1,35 @@
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect } from 'react'
+import { useForm, Controller } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View, Keyboard, Alert } from 'react-native'
 import { Background } from '../components/Background'
 import { WhiteLogo } from '../components/WhiteLogo'
-import { useForm } from '../hooks/useForm';
+
 import { useAppDispatch, useAppSelector } from '../store';
 import { removeError, startLoginWithEmailPassword } from '../store/slices/auth';
 
 import { loginStyles } from '../theme/loginTheme';
+import { isValidEmail } from '../utils/validations';
+
+type FormData = {
+  email: string,
+  password: string
+}
 
 interface Props extends StackScreenProps<any, any> {};
 
 export const LoginScreen = ({ navigation }: Props) => {
 
   const dispatch = useAppDispatch();
-
   const { theme } = useAppSelector( state => state.theme );
   const { errorMessage } = useAppSelector( state => state.auth );
 
-  const { email, password, onChange} = useForm({
-    email: '',
-    password: ''
-  });
+  const { control, handleSubmit, formState: { errors }, watch } = useForm<FormData>();
+  const emailWatch = watch('email');
 
-  const onLogin = () => {
+  const onLogin = (data: FormData) => {
     Keyboard.dismiss();
-    dispatch(startLoginWithEmailPassword({ email, password }));
+    dispatch(startLoginWithEmailPassword({ email: data.email, password: data.password }));
   }
 
   useEffect(() => {
@@ -61,51 +65,74 @@ export const LoginScreen = ({ navigation }: Props) => {
           }}>Login</Text>
 
           <Text style={ loginStyles.label }>Email:</Text>
-          <TextInput 
-            placeholder='Ingrese su email'
-            placeholderTextColor="rgba(255,255,255,0.4)"
-            keyboardType='email-address'
-            underlineColorAndroid="white"
-            style={[
-              loginStyles.inputField,
-              ( Platform.OS === 'ios' ) && loginStyles.inputFieldIOS
-            ]}
-            selectionColor="white"
-
-            onChangeText={( value ) => onChange( value, 'email')}
-            value={ email }
-            onSubmitEditing={ onLogin }
-
-            autoCapitalize='none'
-            autoCorrect={ false }
+          <Controller 
+            control={ control }
+            name="email"
+            rules={{ 
+              required: 'email is required',
+              validate:  value => isValidEmail(emailWatch) || "Email is invalid"
+            }}
+            render={ ({ field: { value, onBlur, onChange } }) => 
+              <TextInput 
+                placeholder='Ingrese su email'
+                placeholderTextColor="rgba(255,255,255,0.4)"
+                keyboardType='email-address'
+                underlineColorAndroid="white"
+                value={ value }
+                onBlur={ onBlur }
+                onChangeText={ onChange }
+                style={[
+                  {borderColor: errors.email ? 'red' : 'white'},
+                  loginStyles.inputField,
+                  ( Platform.OS === 'ios' ) && loginStyles.inputFieldIOS
+                ]}
+                selectionColor="white"
+                onSubmitEditing={ handleSubmit(onLogin) }
+                autoCapitalize='none'
+                autoCorrect={ false }
+              />
+            }
           />
+          {errors.email && <Text style={{ color: 'red', alignSelf: 'stretch', fontWeight: 'bold' }}>{ errors.email?.message }</Text>}
+         
 
           <Text style={ loginStyles.label }>Password:</Text>
-          <TextInput 
-            placeholder='***********'
-            placeholderTextColor="rgba(255,255,255,0.4)"
-            underlineColorAndroid="white"
-            secureTextEntry
-            style={[
-              loginStyles.inputField,
-              ( Platform.OS === 'ios' ) && loginStyles.inputFieldIOS
-            ]}
-            selectionColor="white"
-            
-            onChangeText={( value ) => onChange( value, 'password')}
-            value={ password }
-            onSubmitEditing={ onLogin }
-            
-            autoCapitalize='none'
-            autoCorrect={ false }
+          <Controller 
+            control={ control }
+            name="password"
+            rules={{ 
+                required: 'password is required', 
+                minLength: { value: 6, message: 'Password should be minimun 6 characters long' } 
+            }}
+            render={ ({ field: { value, onBlur, onChange } }) => 
+              <TextInput 
+                placeholder='***********'
+                placeholderTextColor="rgba(255,255,255,0.4)"
+                underlineColorAndroid="white"
+                secureTextEntry
+                value={ value }
+                onBlur={ onBlur }
+                onChangeText={ onChange }
+                style={[
+                  {borderColor: errors.password ? 'red' : 'white'},
+                  loginStyles.inputField,
+                  ( Platform.OS === 'ios' ) && loginStyles.inputFieldIOS
+                ]}
+                selectionColor="white"
+                onSubmitEditing={ handleSubmit(onLogin) }
+                autoCapitalize='none'
+                autoCorrect={ false }
+              />
+            }
           />
+          {errors.password && <Text style={{ color: 'red', alignSelf: 'stretch', fontWeight: 'bold' }}>{ errors.password.message }</Text>}
 
           {/* Boton Login */}
           <View style={ loginStyles.buttonContainer}>
             <TouchableOpacity
               activeOpacity={ 0.8 }
               style={ loginStyles.button }
-              onPress={ onLogin }
+              onPress={ handleSubmit(onLogin) }
             >
               <Text style={ loginStyles.buttonText }>Login</Text>
             </TouchableOpacity>
